@@ -20,6 +20,7 @@ class DataCollection {
   }
 
   create(record) {
+    console.log('datacollection create')
     return this.model.create(record);
   }
 

@@ -1,14 +1,16 @@
 'use strict';
 
 const express = require('express');
+const permissions = require('../middleware/acl2');
+const bearer2 = require('../middleware/bearer2');
 const dataModules = require('../models');
 
 const router = express.Router();
 
-console.log("i'm in my v1 routes");
+console.log("i'm in my v2 routes");
 
 router.param('model', (req, res, next) => {
-  console.log('v1 function', req.params.model);
+  console.log('v2 function', req.params.model);
   const modelName = req.params.model;
   if (dataModules[modelName]) {
     req.model = dataModules[modelName];
@@ -18,11 +20,11 @@ router.param('model', (req, res, next) => {
   }
 });
 
-router.get('/:model', handleGetAll);
-router.get('/:model/:id', handleGetOne);
-router.post('/:model', handleCreate);
-router.put('/:model/:id', handleUpdate);
-router.delete('/:model/:id', handleDelete);
+router.get('/:model', bearer2, handleGetAll);
+router.get('/:model/:id', bearer2, handleGetOne);
+router.post('/:model', bearer2, permissions('create'), handleCreate);
+router.put('/:model/:id', bearer2, permissions('update'), handleUpdate);
+router.delete('/:model/:id', bearer2, permissions('delete'), handleDelete);
 
 async function handleGetAll(req, res) {
   let allRecords = await req.model.get();
